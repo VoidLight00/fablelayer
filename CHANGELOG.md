@@ -5,6 +5,7 @@
 Public-release preparation pass.
 
 - Added README hero SVG and public-facing documentation set.
+- Added `docs/DPTD.md` and `docs/DPTD-ADHD.md` installation/usage documents for professional and ADHD-friendly readers.
 - Added installation, development, security, contribution, and version files.
 - Rewrote attribution and source ledger to avoid direct dependency on high-risk prompt-source repositories.
 - Tightened public-safe source policy language while preserving fail-closed gates.

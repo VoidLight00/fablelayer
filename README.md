@@ -82,6 +82,8 @@ FableLayer's benchmark is designed to preserve raw data and limitations. Do not 
 ## Documentation
 
 - [`docs/INSTALL.md`](./docs/INSTALL.md)
+- [`docs/DPTD.md`](./docs/DPTD.md) — professional technical overview
+- [`docs/DPTD-ADHD.md`](./docs/DPTD-ADHD.md) — ADHD-friendly quick guide
 - [`docs/DEVELOPMENT.md`](./docs/DEVELOPMENT.md)
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - [`SECURITY.md`](./SECURITY.md)
