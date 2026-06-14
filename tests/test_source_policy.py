@@ -13,11 +13,11 @@ from fablelayer.source_policy import (
 
 class TestClassify(unittest.TestCase):
     def test_leaked_is_reference_only(self):
-        result = classify("CL4R1T4S", "leaked", is_leaked=True)
+        result = classify("blocked-prompt-source-a", "non-public-prompt", is_leaked=True)
         self.assertEqual(result, "reference-only")
 
     def test_leaked_overrides_permissive_license(self):
-        # leaked 면 라이선스가 MIT여도 reference-only
+        # non-public이면 라이선스가 MIT여도 reference-only
         result = classify("x", "MIT", is_leaked=True)
         self.assertEqual(result, "reference-only")
 
@@ -63,8 +63,8 @@ class TestDefaultLedger(unittest.TestCase):
 
     def test_leaked_sources_are_reference_only_high(self):
         ledger = default_ledger()
-        leaked = [s for s in ledger if "leaked" in s.license.lower()]
-        self.assertEqual(len(leaked), 2)  # CL4R1T4S, system_prompts_leaks
+        leaked = [s for s in ledger if "non-public-prompt" in s.license.lower()]
+        self.assertEqual(len(leaked), 2)  # blocked-prompt-source-a, blocked-prompt-source-b
         for src in leaked:
             self.assertEqual(src.classification, "reference-only")
             self.assertEqual(src.risk, "high")
@@ -80,8 +80,8 @@ class TestDefaultLedger(unittest.TestCase):
             "awesome-claude-fable-5",
             "xonovex/platform",
             "Cheswick",
-            "CL4R1T4S",
-            "system_prompts_leaks",
+            "blocked-prompt-source-a",
+            "blocked-prompt-source-b",
         }
         self.assertEqual(names, expected)
 
@@ -95,9 +95,9 @@ class TestAudit(unittest.TestCase):
     def test_leaked_classified_copy_fails(self):
         bad = (
             Source(
-                name="CL4R1T4S",
-                url="https://github.com/elder-plinius/CL4R1T4S",
-                license="leaked",
+                name="blocked-prompt-source-a",
+                url="https://github.com/elder-plinius/blocked-prompt-source-a",
+                license="non-public-prompt",
                 classification="copy",
                 risk="high",
             ),
@@ -109,9 +109,9 @@ class TestAudit(unittest.TestCase):
     def test_leaked_classified_adapt_fails(self):
         bad = (
             Source(
-                name="leaks",
+                name="blocked-source",
                 url="https://example.com",
-                license="leaked",
+                license="non-public-prompt",
                 classification="adapt",
                 risk="high",
             ),

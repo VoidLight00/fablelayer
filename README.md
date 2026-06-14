@@ -1,88 +1,94 @@
+<p align="center">
+  <img src="assets/fablelayer-hero.svg" alt="FableLayer — procedure, verification, benchmark">
+</p>
+
 # FableLayer
 
-**Fable is a discipline, not a capability transplant. We open-source the discipline — and the benchmark that proves its limits.**
+**FableLayer is a public-safe procedure, verification, and benchmark layer for LLM workflows.**
 
-FableLayer is a procedure, verification, and output-structure layer for Opus, Sonnet, and local LLMs. It does **not** turn a model into Fable 5.
+It does not claim to transfer a model's underlying capability. It packages the repeatable parts of strong agentic work: evidence discipline, systematic investigation, fail-closed gates, model routing, and honest benchmark records.
 
-## What FableLayer is — and is not
+## Why it exists
 
-The distinction below is load-bearing. The rest of this README, and the project's honesty gate, depend on it.
+Teams often try to improve model behavior by copying long prompts or making vague quality claims. FableLayer takes a stricter approach:
 
-- **Capability is not transferable.** A model's reasoning ceiling — how deep it can chain inference, how well it generalizes — is a property of the model's weights. No prompt, harness, or output style imports another model's capability into Opus or Sonnet. The reconnaissance behind this project (a 19-run A/B plus 26 sessions by the upstream author of the procedure source) reached the same conclusion: model capability does not transfer through a harness.
-- **Procedure is transferable.** What *does* transfer is behavior — the steps a strong operator takes. FableLayer ports only the procedures that were empirically observed to transfer:
-  - **Verification grounding** — finish only after running and observing the artifact, not after asserting it works.
-  - **Multi-story completion with an evidence gate** — refuse to report "done" without grounded evidence.
-  - **Systematic investigation** — reproduce, compete hypotheses, build the causal chain, instead of patching the first guess.
-  - **Early-stop prevention** — a hook that resists quitting before the work is actually complete.
-  - **Structured output** — the ValueOptimizer output style, applied without the lossy compression rules.
+- no private or proprietary prompt text
+- no unverified performance claims
+- no external publishing without approval
+- no “done” without evidence
+- no benchmark number without raw data and limitations
 
-The framing, in one line: FableLayer **does not raise the ceiling; it helps the model reach its own ceiling.**
+## What you get
 
-## The four layers
+| Layer | What it does | Files |
+|---|---|---|
+| PromptCore | Deterministic public-safe operating profile | `fablelayer/promptcore.py`, `core/promptcore.md` |
+| Evidence Gate | Blocks completion claims without evidence | `fablelayer/evidence_gate.py` |
+| Router | Cost-aware Sonnet/Opus/local routing rules | `fablelayer/router.py` |
+| Adapters | Exports Claude Code, Ollama, LM Studio, SillyTavern profiles | `fablelayer/adapters.py` |
+| Benchmark | Deterministic fixture scoring and raw JSON output | `fablelayer/benchmark.py`, `bench/` |
+| Gates | License, performance, runtime, render, publish, completeness checks | `gates/` |
 
-| Layer | Name | Responsibility |
-|-------|------|----------------|
-| 1 | **PromptCore** | Inspired-by structure extraction from prompt sources (no verbatim leaked prompt text), merged with the Fable 5 core notes and the ValueOptimizer sections, version-managed (V2/V3…). |
-| 2 | **ProcedureHarness** | The four transferable procedures above, as files and hooks. Includes an optional 2-pass review. |
-| 3 | **ValueOptimizer** | Output-style application, a cost-aware model router (task-type → model), drift prevention, and an always-on passive mode. Deliberately **omits compression rules** (see below). |
-| 4 | **SkillPack & Router** | A unified interface over autonomous-build, session-handoff, and optimizer skills, plus a Smart Model Router (Sonnet by default; automatic switch to Opus for complex work, with documented routing criteria). |
-
-### Why no compression rules
-
-The upstream ValueOptimizer source (`value-for-fable`) shipped compression rules in its first version. On neutral re-verification, those rules read as a quality liability rather than a gain — the original benchmark could not be reproduced because the raw data was lost, and removing the compression rules was the real improvement. FableLayer therefore does **not** carry them. ValueOptimizer here applies output structure, not output shrinkage.
-
-## Deployment forms
-
-FableLayer ships in three forms from one source tree:
-
-1. **Claude Code plugin** — a `.claude-plugin/marketplace.json` plus a `plugin.json`, both valid JSON, installable into Claude Code.
-2. **CLI** — `fablelayer init`, `fablelayer upgrade <model>`, and `fablelayer benchmark` subcommands.
-3. **Local LLM adapter** — a config generator for Ollama, LM Studio, and SillyTavern.
-
-## Installation
+## Quick start
 
 ```bash
-# Clone
-git clone <repo-url> fablelayer
+git clone https://github.com/VoidLight00/fablelayer.git
 cd fablelayer
 
-# Inspect the CLI
+python3 tests/run_tests.py
+bash gates/selftest.sh
+bash gates/verify_fablelayer.sh . --mode new
+
 ./cli/fablelayer --help
-
-# Scaffold into a project (local artifacts only; no external push)
-./cli/fablelayer init
-
-# Upgrade a target model with the FableLayer procedure layer
-./cli/fablelayer upgrade sonnet
+./cli/fablelayer init --target ./_dist/demo --apply
 ```
 
-By default every operation writes **local artifacts only**. Creating a GitHub repository, pushing, registering on a marketplace, or merging a PR happens **only behind an explicit approval gate** — never as a side effect of a normal run.
+See [`docs/INSTALL.md`](./docs/INSTALL.md) for detailed installation options.
 
-## Honest performance
+## CLI
 
-Performance numbers live in `bench/` and nowhere else. This README makes no unverified performance claim, by policy and by gate.
+```bash
+./cli/fablelayer init                 # dry-run scaffold
+./cli/fablelayer init --apply         # write local layer files
+./cli/fablelayer upgrade sonnet       # preview routing decision
+./cli/fablelayer benchmark            # run deterministic benchmark fixtures
+./cli/fablelayer check --file output.md
+./cli/fablelayer status
+./cli/fablelayer resume
+```
 
-- The benchmark suite (`bench/RESULTS.md`) ships with raw data, a reproduction script, a neutral scoring rubric, at least two independent judging methods, and a mandatory **Limitations** section.
-- The honesty gate (`gates/perf_claim_gate.sh`) blocks any quantitative performance assertion in docs that lacks a `[bench/...]` reference. If you want a number, read the benchmark and cite it.
-- Summary of what the neutral re-verification found, stated as procedure rather than capability: structured Sonnet output was roughly comparable to Opus within measurement noise on the tested tasks, at a fraction of the output cost, while genuinely deep reasoning still favored Opus. The original upstream benchmark was **not** reproducible (raw data lost). Read `bench/RESULTS.md` and its Limitations section before citing any of this.
+## Verification
 
-## Run manifest
+```bash
+python3 tests/run_tests.py
+bash gates/selftest.sh
+bash gates/verify_fablelayer.sh . --mode new
+```
 
-Every run records a `runs/<run_id>/RUN_MANIFEST.json` capturing the mode, inputs, phases, and gate results. Phases use a fixed enum (`0-context`, `1-spec`, `2-build`, `3-gates`, `4-bench`, `5-report`). `status` and `resume` operate against this manifest.
+Current local evidence:
 
-## Scope
+- 152 stdlib tests pass
+- `LICENSE/PERF/BENCH/COMPLETE/RENDER/RUNTIME` gates pass
+- publish without approval exits non-zero by design
 
-FableLayer's MVP is the four layers, the three deployment forms, and the benchmark suite. A web dashboard, a community marketplace, and LoRA training are **out of MVP scope** and are deferred by phase in `ROADMAP.md`. Nothing deferred is reported as implemented.
+## Public-safe source policy
 
-## License and attribution
+FableLayer is an original implementation. It may reference public methodology sources in [`ATTRIBUTION.md`](./ATTRIBUTION.md), but it does not copy private, proprietary, or non-public prompt text. High-risk source classes are blocked/reference-only and are not required to use this project.
 
-FableLayer is licensed under **AGPL-3.0** (`LICENSE`, with `NOTICE`).
+## Performance honesty
 
-Every upstream source is recorded in [`ATTRIBUTION.md`](./ATTRIBUTION.md) with its honest license status (MIT vs. unclear, distinguished explicitly). Leaked-prompt sources are referenced as structure inspiration only — **no verbatim leaked prompt text is included**, and the license gate (`gates/license_gate.sh`) enforces this with a hard exit.
+FableLayer's benchmark is designed to preserve raw data and limitations. Do not cite quality or cost claims without a `bench/` reference. See [`bench/RESULTS.md`](./bench/RESULTS.md).
 
 ## Documentation
 
-- [`README.ko.md`](./README.ko.md) — Korean README.
-- [`ATTRIBUTION.md`](./ATTRIBUTION.md) — sources and license status.
-- [`ROADMAP.md`](./ROADMAP.md) — phased scope, including deferred features.
-- `bench/RESULTS.md` — benchmark results, raw data, reproduction, and limitations.
+- [`docs/INSTALL.md`](./docs/INSTALL.md)
+- [`docs/DEVELOPMENT.md`](./docs/DEVELOPMENT.md)
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+- [`SECURITY.md`](./SECURITY.md)
+- [`ROADMAP.md`](./ROADMAP.md)
+- [`ATTRIBUTION.md`](./ATTRIBUTION.md)
+- [`README.ko.md`](./README.ko.md)
+
+## License
+
+AGPL-3.0. See [`LICENSE`](./LICENSE) and [`NOTICE`](./NOTICE).

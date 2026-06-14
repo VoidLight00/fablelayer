@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 # FL7 license/legal gate — HARD exit 2. macOS bash 3.2 safe, fail-closed.
-# Blocks: leaked-prompt full text / copy directives + missing LICENSE/NOTICE/ATTRIBUTION + non-AGPL.
+# Blocks: non-public prompt text / copy directives + missing LICENSE/NOTICE/ATTRIBUTION + non-AGPL.
 set -u
 ROOT="${1:-$(pwd)}"
 RC=0
 
-# 1) leaked-prompt full text or copy directives anywhere in product artifacts
+# 1) non-public prompt text or copy directives anywhere in product artifacts
 if grep -RIElq --include='*.md' --include='*.txt' --include='*.py' --include='*.sh' --include='*.json' \
    --exclude='REQUIREMENTS.md' --exclude='ATTRIBUTION.md' --exclude='license_gate.sh' \
    --exclude-dir='.git' --exclude-dir='node_modules' --exclude-dir='fixtures' --exclude-dir='snapshots' \
    -e '12만 자 leaked prompt' \
    -e 'leaked prompt 자동 압축' \
-   -e 'CL4R1T4S.*copy' \
-   -e 'system_prompts_leaks.*copy' \
+   -e 'blocked-prompt-source.*copy' \
+   -e 'non-public prompt.*copy' \
    -e 'full leaked system prompt' \
    -e 'reproduce the full system prompt' \
    "$ROOT" 2>/dev/null; then
-  echo "LICENSE FAIL(2): leaked-prompt copy directive or full text present"; RC=2
+  echo "LICENSE FAIL(2): non-public prompt copy directive or full text present"; RC=2
 fi
 
 # 2) required legal files
@@ -31,9 +31,9 @@ if [ -f "$ROOT/LICENSE" ]; then
   fi
 fi
 
-# 4) ATTRIBUTION must list sources honestly (at least the 4 code sources + leaked-prompt sources flagged)
+# 4) ATTRIBUTION must list methodology sources and blocked source policy honestly
 if [ -f "$ROOT/ATTRIBUTION.md" ]; then
-  for src in fablize value-for-fable supergoal CL4R1T4S; do
+  for src in fablize value-for-fable supergoal "Blocked source class"; do
     if ! grep -qi "$src" "$ROOT/ATTRIBUTION.md"; then
       echo "LICENSE FAIL(2): ATTRIBUTION.md missing source $src"; RC=2
     fi

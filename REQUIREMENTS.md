@@ -7,7 +7,7 @@
 > - `itsinseong/value-for-fable` 139★ — ValueOptimizer(VFF v2) 원천. **원판 벤치 재현 실패 → 중립 재검증: Sonnet+v2 ≈ Opus(동률), 0.30배 비용. 깊은 추론은 Opus 우세.**
 > - `robzilla1738/supergoal` 478★ — 자율 빌드 루프 + adaptive phase + self-healing.
 > - `ucsandman/context-handoff-bundle` 1★ — 세션 핸드오프 + drift detection.
-> - `elder-plinius/CL4R1T4S` 34k★ / `asgeirtj/system_prompts_leaks` 42k★ — leaked prompt 원천(라이선스 모호 → 전문 포함 금지).
+> - `blocked non-public prompt source class` — high-risk source category(라이선스·재배포 권리 불명확 → 원문 포함 금지).
 
 ## 정체성 (PRD 전제의 실측 보정)
 

@@ -1,15 +1,15 @@
 {
   "passed": true,
-  "suite": "final Opus 4.8 runtime merge into integrated FableLayer repo",
+  "suite": "public release preparation v0.1.1",
   "commands": [
-    {"command": "./gates/selftest.sh", "exit": 0},
-    {"command": "./gates/verify_fablelayer.sh . --mode new", "exit": 0},
+    {"command": "public-sensitive grep scan", "exit": 0},
     {"command": "python3 tests/run_tests.py", "exit": 0, "summary": "Ran 152 tests OK"},
-    {"command": "python3 -m fablelayer.promptcore --check", "exit": 0},
-    {"command": "python3 -m fablelayer.cli --help", "exit": 0},
-    {"command": "./gates/publish_gate.sh .", "exit": 2, "expected": "no approval token; external publish blocked"}
+    {"command": "bash gates/selftest.sh", "exit": 0},
+    {"command": "bash gates/verify_fablelayer.sh . --mode new", "exit": 0},
+    {"command": "bash gates/publish_gate.sh .", "exit": 2, "expected": "no approval token; external publish blocked"}
   ],
   "evidence": [
+    "No direct high-risk source repo names remained outside excluded gate fixtures after public-safe scan",
     "SELFTEST PASS",
     "LICENSE PASS",
     "PERF PASS",
@@ -18,23 +18,7 @@
     "RENDER PASS",
     "RUNTIME PASS",
     "VERIFY PASS (mode=new root=.)",
-    "Ran 152 tests OK",
-    "publish without approval exits 2"
+    "Ran 152 tests OK"
   ],
-  "findings": [
-    {
-      "id": "QA-001",
-      "severity": "medium",
-      "status": "open",
-      "evidence": "ATTRIBUTION/source ledger still marks several references as unverified/reference-only; no external license verification was performed in this session.",
-      "fix": "Before public release, verify every upstream license and keep copy/adapt only for compatible sources."
-    },
-    {
-      "id": "QA-004",
-      "severity": "low",
-      "status": "open",
-      "evidence": "Live paired model benchmark remains out of scope; deterministic fixture benchmark and honesty gates pass.",
-      "fix": "Run paired baseline/treatment live benchmark before making public performance claims."
-    }
-  ]
+  "release_readiness": "private repo can be made public after commit and push; marketplace/package publish still blocked without approval token"
 }

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fablelayer"
-version = "0.1.0"
+version = "0.1.1"
 description = "FableLayer — transferable procedure/output-structure layer for LLMs. Discipline, not a capability transplant. Standard library only, zero external dependencies."
 readme = "README.md"
 requires-python = ">=3.10"

@@ -1,6 +1,6 @@
 """FableLayer source policy (FL7, FL-GAP-01).
 
-소스 라이선스 분류와 leaked-prompt 정책을 fail-closed로 강제한다.
+소스 라이선스 분류와 non-public prompt 정책을 fail-closed로 강제한다.
 GateResult 는 evidence_gate 의 정본을 재사용하되, 아직 모듈이 없으면
 INTERFACE.md 와 동일한 계약으로 폴백 정의한다(계약 일치 보장).
 """
@@ -63,7 +63,7 @@ def _is_permissive_license(license: str) -> bool:
 def classify(name: str, license: str, is_leaked: bool) -> str:
     """소스 분류를 결정한다.
 
-    - leaked -> 'reference-only' (전문 포함 금지, risk high)
+    - non-public -> 'reference-only' (전문 포함 금지, risk high)
     - unknown license -> 'unverified' (fail-closed: 검증 전 채택 금지)
     - MIT/permissive -> 'adapt'
     - 그 외 식별 가능한 라이선스 -> 'reference-only' (보수적)
@@ -155,15 +155,15 @@ def default_ledger() -> tuple[Source, ...]:
             False,
         ),
         _make_source(
-            "CL4R1T4S",
-            "https://github.com/elder-plinius/CL4R1T4S",
-            "leaked",
+            "blocked-prompt-source-a",
+            "https://example.invalid/blocked-prompt-source-a",
+            "non-public-prompt",
             True,
         ),
         _make_source(
-            "system_prompts_leaks",
-            "https://github.com/asgeirtj/system_prompts_leaks",
-            "leaked",
+            "blocked-prompt-source-b",
+            "https://example.invalid/blocked-prompt-source-b",
+            "non-public-prompt",
             True,
         ),
     )
@@ -193,7 +193,7 @@ def audit(ledger: tuple[Source, ...]) -> GateResult:
         leaked_like = _is_leaked_like(src)
         if leaked_like and src.classification in ("copy", "adapt"):
             reasons = reasons + (
-                f"{src.name}: leaked source must not be copy/adapt "
+                f"{src.name}: non-public source must not be copy/adapt "
                 f"(got '{src.classification}')",
             )
 
@@ -207,8 +207,9 @@ def audit(ledger: tuple[Source, ...]) -> GateResult:
 
 
 def _is_leaked_like(src: Source) -> bool:
-    """소스가 leaked 성격인지 판정(보수적)."""
-    if "leaked" in _normalize_license(src.license):
+    """소스가 non-public 성격인지 판정(보수적)."""
+    normalized_license = _normalize_license(src.license)
+    if "non-public" in normalized_license or "leaked" in normalized_license:
         return True
     if src.classification == "reference-only" and src.risk == "high":
         return True

@@ -43,9 +43,9 @@ def route(task:TaskSpec) -> RouteDecision   # default "sonnet"; any signal -> "o
 CLASS = ("copy","adapt","reference-only","blocked","unverified")
 @dataclass(frozen=True)
 class Source: name:str; url:str; license:str; classification:str; risk:str  # risk in {low,medium,high}
-def classify(name:str, license:str, is_leaked:bool) -> str   # leaked -> "reference-only"+risk high; unknown license -> "unverified"; MIT -> "adapt"
-def default_ledger() -> tuple[Source,...]   # the 10 sources from ATTRIBUTION.md (fablize, value-for-fable, supergoal, context-handoff, sgup/ai, awesome, xonovex, Cheswick, CL4R1T4S, system_prompts_leaks)
-def audit(ledger:tuple[Source,...]) -> GateResult  # fail if any leaked source classified copy/adapt, or any blocked present in build
+def classify(name:str, license:str, is_non_public:bool) -> str   # non-public -> "reference-only"+risk high; unknown license -> "unverified"; MIT -> "adapt"
+def default_ledger() -> tuple[Source,...]   # public methodology sources + one generic blocked non-public source class from ATTRIBUTION.md
+def audit(ledger:tuple[Source,...]) -> GateResult  # fail if any non-public source classified copy/adapt, or any blocked present in build
 ```
 
 ## fablelayer/benchmark.py  (FL6)
@@ -87,7 +87,7 @@ def main(argv:list[str]) -> int   # subcommands: init / upgrade <model> / benchm
 - `tests/test_promptcore.py`: render 결정성, merge 압축규칙 거부(ValueError), --check 드리프트
 - `tests/test_evidence_gate.py`: 완료어+무증거 → fail, 증거 있으면 pass, scan 음성/양성
 - `tests/test_router.py`: 각 신호 발화 → opus, 무신호 → sonnet, explicit_opus 비강등
-- `tests/test_source_policy.py`: leaked → reference-only/high, MIT → adapt, audit fail-closed
+- `tests/test_source_policy.py`: non-public → reference-only/high, MIT → adapt, audit fail-closed
 - `tests/test_adapters.py`: export_all 4+ paths, lmstudio JSON private_prompt_included False, 필수키 존재
 - `tests/test_benchmark.py`: deterministic_judge 재현성, write_raw JSON 스키마
 - `tests/run_tests.py`: 단일 진입점, 모든 test_*.py 실행, 하나라도 실패 시 exit 1
