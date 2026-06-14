@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fablelayer"
+version = "0.1.0"
+description = "FableLayer — transferable procedure/output-structure layer for LLMs. Discipline, not a capability transplant. Standard library only, zero external dependencies."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "AGPL-3.0-only" }
+authors = [{ name = "FableLayer" }]
+keywords = ["llm", "prompt", "procedure", "evidence-gate", "router", "benchmark"]
+# 외부 의존 0 — 표준 라이브러리만 사용한다 (INTERFACE.md 계약).
+dependencies = []
+
+[project.scripts]
+fablelayer = "fablelayer.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/fablelayer/fablelayer"
+
+[tool.setuptools]
+packages = ["fablelayer"]

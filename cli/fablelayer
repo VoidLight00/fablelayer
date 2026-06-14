@@ -1,0 +1,396 @@
+#!/usr/bin/env bash
+# FableLayer CLI — FL5 배포 형태 (b). macOS bash 3.2 안전.
+#
+# 정직성 경계 (FL9):
+#   FableLayer는 모델 capability를 전이하지 않는다(capability 비전이).
+#   이 CLI가 설치하는 것은 *전이 가능한 절차·출력구조 레이어*뿐이다.
+#   성능 수치(유사도/점수/절감률)는 이 도구의 어떤 출력에도 단언하지 않는다.
+#   측정값은 `bench/RESULTS.md` 의 한계 명시와 함께만 참조한다.
+#
+# 서브커맨드:
+#   init                  현재 프로젝트에 FableLayer 절차 레이어를 설치 (기본 dry-run)
+#   upgrade <model>       opus|sonnet|local 대상에 절차 레이어 라우팅 적용 (기본 dry-run)
+#   benchmark             bench/ 재현 스크립트를 찾아 실행 (정직한 측정)
+#
+# 파괴적 동작(파일 쓰기)은 --apply 가 있을 때만 수행한다. 없으면 dry-run.
+# 인자 없이 호출하면 usage 를 출력하고 exit 0.
+
+set -u
+
+# --- 경로 해석: 이 스크립트는 <product_root>/cli/fablelayer 에 위치 ---
+SELF="$0"
+# symlink 추적 없이 dirname 만으로 충분 (CLI 진입점은 cli/ 안에 고정)
+CLI_DIR="$(cd "$(dirname "$SELF")" && pwd)"
+PRODUCT_ROOT="$(cd "$CLI_DIR/.." && pwd)"
+
+PROG="fablelayer"
+VERSION="0.1.0"
+
+# FableLayer 가 설치/참조하는 전이 가능한 레이어 디렉토리 (capability 아님, 절차임)
+LAYER_DIRS="core styles skills agents adapters"
+
+# ---------------------------------------------------------------------------
+# 출력 헬퍼
+# ---------------------------------------------------------------------------
+say()  { printf '%s\n' "$*"; }
+err()  { printf '%s\n' "$*" >&2; }
+hr()   { printf '%s\n' "------------------------------------------------------------"; }
+
+usage() {
+  cat <<USAGE
+$PROG $VERSION — FableLayer CLI
+
+  Fable is a discipline, not a capability transplant.
+  This CLI installs the transferable *procedure/output-structure layer*.
+  It does NOT transfer model capability. 성능 수치는 bench/RESULTS.md 참조.
+
+USAGE:
+  $PROG <command> [args] [--apply] [--target DIR]
+
+COMMANDS:
+  init                 현재 프로젝트(또는 --target DIR)에 FableLayer 절차 레이어 설치
+                       기본은 dry-run. 실제 쓰기는 --apply 필요.
+  upgrade <model>      대상 모델 라우팅에 절차 레이어 적용
+                       <model> = opus | sonnet | local
+                       기본은 dry-run. 실제 쓰기는 --apply 필요.
+  benchmark            bench/ 의 재현 스크립트를 찾아 실행 (정직한 측정)
+
+GLOBAL OPTIONS:
+  --apply              파괴적 동작(파일 쓰기)을 실제로 수행 (없으면 dry-run)
+  --target DIR         init/upgrade 대상 디렉토리 (기본: 현재 작업 디렉토리)
+  -h, --help           이 도움말 출력
+  -V, --version        버전 출력
+
+NOTES:
+  - 파괴적 동작은 --apply 없으면 미리보기만 한다(dry-run).
+  - 외부 push/deploy/marketplace 등록은 이 CLI 가 수행하지 않는다(FL15 승인 게이트).
+  - 전이되는 것은 절차(verification grounding, evidence gate, systematic
+    investigation, early-stop 방지, VFF 출력구조)뿐이다. capability 는 전이 불가.
+
+EXAMPLES:
+  $PROG init                       # 무엇을 설치할지 미리보기
+  $PROG init --apply               # 현재 프로젝트에 실제 설치
+  $PROG init --target ./my-app --apply
+  $PROG upgrade sonnet             # sonnet 라우팅 적용 미리보기
+  $PROG upgrade sonnet --apply
+  $PROG benchmark                  # bench 재현 스크립트 실행
+USAGE
+}
+
+# ---------------------------------------------------------------------------
+# 공통 인자 파싱 (전역 옵션)
+# ---------------------------------------------------------------------------
+APPLY=0
+TARGET=""
+POSITIONAL=""   # 공백 구분 (서브커맨드 인자는 단순 토큰만 받으므로 안전)
+
+parse_global() {
+  # 첫 토큰(서브커맨드)은 호출부에서 이미 shift 했다고 가정
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --apply)   APPLY=1 ;;
+      --target)
+        shift
+        if [ "$#" -eq 0 ]; then err "ERROR: --target 에 디렉토리가 필요합니다"; return 2; fi
+        TARGET="$1"
+        ;;
+      --target=*) TARGET="${1#--target=}" ;;
+      -h|--help)  usage; exit 0 ;;
+      -V|--version) say "$PROG $VERSION"; exit 0 ;;
+      --*) err "ERROR: 알 수 없는 옵션 '$1'"; return 2 ;;
+      *)
+        if [ -z "$POSITIONAL" ]; then POSITIONAL="$1"; else POSITIONAL="$POSITIONAL $1"; fi
+        ;;
+    esac
+    shift
+  done
+  return 0
+}
+
+resolve_target() {
+  if [ -n "$TARGET" ]; then
+    printf '%s\n' "$TARGET"
+  else
+    pwd
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# 레이어 가용성 점검 (발명하지 않는다 — 부재 시 정직하게 보고)
+# ---------------------------------------------------------------------------
+report_layer_status() {
+  local present=0
+  local absent=0
+  for d in $LAYER_DIRS; do
+    if [ -d "$PRODUCT_ROOT/$d" ]; then
+      say "  [있음]  $d/"
+      present=$((present + 1))
+    else
+      say "  [없음]  $d/   (선행 레이어 산출물 부재 — 발명하지 않음)"
+      absent=$((absent + 1))
+    fi
+  done
+  if [ "$absent" -gt 0 ]; then
+    say ""
+    say "  주의: 일부 레이어가 아직 생성되지 않았습니다. 설치는 존재하는 레이어만 대상으로 합니다."
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# init — 현재 프로젝트에 FableLayer 절차 레이어 설치
+# ---------------------------------------------------------------------------
+cmd_init() {
+  local dest
+  dest="$(resolve_target)"
+  if [ ! -d "$dest" ]; then
+    err "ERROR: 대상 디렉토리가 없습니다: $dest"
+    return 2
+  fi
+  dest="$(cd "$dest" && pwd)"
+
+  local install_dir="$dest/.fablelayer"
+
+  hr
+  say "$PROG init"
+  hr
+  say "대상 프로젝트: $dest"
+  say "설치 위치    : $install_dir/"
+  say "소스 루트    : $PRODUCT_ROOT"
+  say ""
+  say "전이 가능한 레이어 (capability 아님, 절차임):"
+  report_layer_status
+  say ""
+
+  if [ "$APPLY" -ne 1 ]; then
+    say "[dry-run] 실제로 수행할 작업:"
+    say "  1) mkdir -p $install_dir"
+    for d in $LAYER_DIRS; do
+      if [ -d "$PRODUCT_ROOT/$d" ]; then
+        say "  2) cp -R $PRODUCT_ROOT/$d -> $install_dir/$d  (절차 레이어 복사)"
+      fi
+    done
+    say "  3) $install_dir/MANIFEST 작성 (설치된 레이어 목록 + 출처)"
+    say ""
+    say "실행하려면 --apply 를 붙이세요:  $PROG init --apply"
+    return 0
+  fi
+
+  # --- 실제 설치 (--apply) ---
+  mkdir -p "$install_dir" || { err "ERROR: $install_dir 생성 실패"; return 1; }
+  local copied=0
+  for d in $LAYER_DIRS; do
+    if [ -d "$PRODUCT_ROOT/$d" ]; then
+      rm -rf "$install_dir/$d"
+      cp -R "$PRODUCT_ROOT/$d" "$install_dir/$d" \
+        && { say "설치됨: $install_dir/$d"; copied=$((copied + 1)); } \
+        || err "WARN: $d 복사 실패"
+    fi
+  done
+
+  {
+    say "# FableLayer 설치 매니페스트"
+    say "installed_at: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+    say "source_root: $PRODUCT_ROOT"
+    say "cli_version: $VERSION"
+    say "note: capability 비전이 — 절차·출력구조 레이어만 설치됨. 성능 수치는 bench/RESULTS.md 참조."
+    say "layers:"
+    for d in $LAYER_DIRS; do
+      [ -d "$install_dir/$d" ] && say "  - $d"
+    done
+  } > "$install_dir/MANIFEST"
+
+  say ""
+  if [ "$copied" -eq 0 ]; then
+    say "설치할 레이어가 없었습니다(선행 산출물 부재). MANIFEST 만 기록했습니다: $install_dir/MANIFEST"
+    return 0
+  fi
+  say "완료: 레이어 $copied 개 설치, 매니페스트 기록 ($install_dir/MANIFEST)"
+  return 0
+}
+
+# ---------------------------------------------------------------------------
+# upgrade <model> — opus|sonnet|local 대상에 절차 레이어 라우팅 적용
+# ---------------------------------------------------------------------------
+cmd_upgrade() {
+  local model="$1"
+  if [ -z "$model" ]; then
+    err "ERROR: upgrade 에 모델이 필요합니다. <model> = opus | sonnet | local"
+    return 2
+  fi
+  case "$model" in
+    opus|sonnet|local) : ;;
+    *)
+      err "ERROR: 지원하지 않는 모델 '$model'. opus | sonnet | local 중 하나여야 합니다."
+      return 2
+      ;;
+  esac
+
+  local dest
+  dest="$(resolve_target)"
+  if [ ! -d "$dest" ]; then err "ERROR: 대상 디렉토리가 없습니다: $dest"; return 2; fi
+  dest="$(cd "$dest" && pwd)"
+
+  local install_dir="$dest/.fablelayer"
+  local routing_file="$install_dir/routing.$model.conf"
+
+  hr
+  say "$PROG upgrade $model"
+  hr
+  say "대상 프로젝트  : $dest"
+  say "대상 모델      : $model"
+  say "라우팅 파일    : $routing_file"
+  say ""
+
+  # 라우팅 규칙 본문 — Smart Model Router(FL4) 기준의 절차 적용.
+  # 수치 단언 없음. 작업유형 → 모델 매핑만.
+  routing_body() {
+    say "# FableLayer 라우팅 설정 (절차 레이어 적용)"
+    say "# model_target: $model"
+    say "# generated_by: $PROG $VERSION"
+    say "# note: capability 비전이. 작업유형별 라우팅은 절차이며 성능 단언이 아니다."
+    say ""
+    case "$model" in
+      sonnet)
+        say "default_model = sonnet"
+        say "escalate_to   = opus     # 깊은 추론/아키텍처 결정 시 자동 상향"
+        say "escalate_when = deep-reasoning,architecture,multi-file-refactor"
+        ;;
+      opus)
+        say "default_model = opus"
+        say "escalate_to   = opus     # 이미 최상위 — 상향 없음"
+        say "escalate_when = (none)"
+        ;;
+      local)
+        say "default_model = local    # Ollama/LM Studio/SillyTavern 어댑터 경유"
+        say "escalate_to   = sonnet   # 로컬 한계 작업은 클라우드로 상향(승인 필요)"
+        say "escalate_when = deep-reasoning,long-context"
+        ;;
+    esac
+    say ""
+    say "# 전이 적용 절차 (Fable 실증 전이 항목):"
+    say "apply_verification_grounding = on"
+    say "apply_evidence_gate          = on"
+    say "apply_systematic_investigation = on"
+    say "prevent_early_stop           = on"
+    say "apply_vff_output_style       = on"
+    say "# 압축 규칙 도입 금지 (value-for-fable v2 교훈 — 품질 부채)"
+    say "enable_compression_rules     = off"
+  }
+
+  if [ "$APPLY" -ne 1 ]; then
+    say "[dry-run] 작성할 라우팅 설정 미리보기:"
+    say ""
+    routing_body | sed 's/^/    /'
+    say ""
+    say "실행하려면 --apply 를 붙이세요:  $PROG upgrade $model --apply"
+    return 0
+  fi
+
+  mkdir -p "$install_dir" || { err "ERROR: $install_dir 생성 실패"; return 1; }
+  routing_body > "$routing_file" || { err "ERROR: 라우팅 파일 작성 실패"; return 1; }
+  say "완료: 라우팅 적용됨 -> $routing_file"
+  return 0
+}
+
+# ---------------------------------------------------------------------------
+# benchmark — bench/ 재현 스크립트 실행 (정직한 측정)
+# ---------------------------------------------------------------------------
+cmd_benchmark() {
+  local bench_dir="$PRODUCT_ROOT/bench"
+
+  hr
+  say "$PROG benchmark"
+  hr
+  say "bench 디렉토리: $bench_dir"
+  say ""
+
+  if [ ! -d "$bench_dir" ]; then
+    say "bench/ 디렉토리가 아직 없습니다(선행 산출물 부재)."
+    say "benchmark-engineer 가 bench/RESULTS.md + 원자료 + 재현 스크립트를 생성해야 합니다."
+    say "성능 주장은 bench/ 실측과 '## 한계' 명시 없이는 단언하지 않습니다(FL9)."
+    return 1
+  fi
+
+  # 재현 스크립트 탐색 (gate 와 동일 규약: *.sh|*.js|*.py|*.mjs)
+  local repro
+  repro="$(find "$bench_dir" \( -name '*.sh' -o -name '*.mjs' -o -name '*.js' -o -name '*.py' \) 2>/dev/null | head -1)"
+
+  if [ -z "$repro" ]; then
+    say "bench/ 에 재현 스크립트(*.sh|*.js|*.py|*.mjs)가 없습니다."
+    say "RESULTS.md 의 수치는 재현 스크립트와 원자료 없이는 신뢰하지 않습니다(bench_integrity_gate)."
+    return 1
+  fi
+
+  say "재현 스크립트 발견: $repro"
+  say "실행 시작 (정직한 측정 — 출력은 그대로 표시):"
+  hr
+
+  case "$repro" in
+    *.sh)  bash "$repro" ;;
+    *.mjs|*.js) command -v node >/dev/null 2>&1 && node "$repro" || { err "ERROR: node 미설치 — $repro 실행 불가"; return 1; } ;;
+    *.py)  command -v python3 >/dev/null 2>&1 && python3 "$repro" || { err "ERROR: python3 미설치 — $repro 실행 불가"; return 1; } ;;
+    *) err "ERROR: 실행 방법을 모르는 스크립트: $repro"; return 1 ;;
+  esac
+  local rc=$?
+
+  hr
+  if [ "$rc" -eq 0 ]; then
+    say "benchmark 재현 완료 (exit 0). 결과는 $bench_dir/RESULTS.md 의 '## 한계' 와 함께 해석하세요."
+  else
+    say "benchmark 재현 실패 (exit $rc). 수치를 채택하기 전 실패 원인을 확인하세요."
+  fi
+  return "$rc"
+}
+
+# ---------------------------------------------------------------------------
+# 메인 디스패치
+# ---------------------------------------------------------------------------
+main() {
+  if [ "$#" -eq 0 ]; then
+    usage
+    exit 0
+  fi
+
+  # 최상위 도움말/버전 플래그 (서브커맨드 없이)
+  case "$1" in
+    -h|--help)    usage; exit 0 ;;
+    -V|--version) say "$PROG $VERSION"; exit 0 ;;
+  esac
+
+  local sub="$1"
+  shift
+
+  if ! parse_global "$@"; then
+    err ""
+    err "usage 는 '$PROG --help' 로 확인하세요."
+    exit 2
+  fi
+
+  case "$sub" in
+    init)
+      cmd_init
+      exit $?
+      ;;
+    upgrade)
+      # 첫 positional 이 모델
+      local model_arg=""
+      if [ -n "$POSITIONAL" ]; then
+        model_arg="${POSITIONAL%% *}"
+      fi
+      cmd_upgrade "$model_arg"
+      exit $?
+      ;;
+    benchmark)
+      cmd_benchmark
+      exit $?
+      ;;
+    *)
+      err "ERROR: 알 수 없는 명령 '$sub'"
+      err ""
+      usage
+      exit 2
+      ;;
+  esac
+}
+
+main "$@"

@@ -1,0 +1,268 @@
+{
+  "generator": "fablelayer.benchmark.write_raw",
+  "judge": "B_rule_keyword_coverage",
+  "runs": [
+    {
+      "judge": "A_rubric_quality_0_5",
+      "model": "deterministic",
+      "raw": {
+        "delta": 16.666667,
+        "disagree": false,
+        "disagree_threshold": 25.0,
+        "judge": "A_rubric_quality_0_5",
+        "matched_count": 4,
+        "matched_keywords": [
+          "root cause",
+          "reproduce",
+          "fix",
+          "test"
+        ],
+        "other_judge": "B_rule_keyword_coverage",
+        "other_score": 66.666667,
+        "output_present": true,
+        "prompt": "A pagination helper returns one fewer item on the last page. A failing test is provided. Reproduce the failure, identify the root cause, propose the fix, and state how you verified it (test pass / exit code).",
+        "quality_markers": 2,
+        "rubric": [
+          "root cause",
+          "off-by-one",
+          "reproduce",
+          "fix",
+          "test",
+          "verify"
+        ],
+        "rubric_count": 6,
+        "rubric_valid": [
+          "root cause",
+          "off-by-one",
+          "reproduce",
+          "fix",
+          "test",
+          "verify"
+        ],
+        "score": 50.0
+      },
+      "score": 50.0,
+      "task_id": "dbg-001"
+    },
+    {
+      "judge": "B_rule_keyword_coverage",
+      "model": "deterministic",
+      "raw": {
+        "delta": 16.666667,
+        "disagree": false,
+        "disagree_threshold": 25.0,
+        "judge": "B_rule_keyword_coverage",
+        "matched_count": 4,
+        "matched_keywords": [
+          "root cause",
+          "reproduce",
+          "fix",
+          "test"
+        ],
+        "other_judge": "A_rubric_quality_0_5",
+        "other_score": 50.0,
+        "output_present": true,
+        "prompt": "A pagination helper returns one fewer item on the last page. A failing test is provided. Reproduce the failure, identify the root cause, propose the fix, and state how you verified it (test pass / exit code).",
+        "quality_markers": 2,
+        "rubric": [
+          "root cause",
+          "off-by-one",
+          "reproduce",
+          "fix",
+          "test",
+          "verify"
+        ],
+        "rubric_count": 6,
+        "rubric_valid": [
+          "root cause",
+          "off-by-one",
+          "reproduce",
+          "fix",
+          "test",
+          "verify"
+        ],
+        "score": 66.666667
+      },
+      "score": 66.666667,
+      "task_id": "dbg-001"
+    },
+    {
+      "judge": "A_rubric_quality_0_5",
+      "model": "deterministic",
+      "raw": {
+        "delta": 50.0,
+        "disagree": true,
+        "disagree_threshold": 25.0,
+        "judge": "A_rubric_quality_0_5",
+        "matched_count": 6,
+        "matched_keywords": [
+          "action item",
+          "decision",
+          "owner",
+          "deadline",
+          "summary",
+          "status"
+        ],
+        "other_judge": "B_rule_keyword_coverage",
+        "other_score": 100.0,
+        "output_present": true,
+        "prompt": "action item, decision, owner, deadline, summary, status — these are listed but with no reasoning shown.",
+        "quality_markers": 0,
+        "rubric": [
+          "action item",
+          "decision",
+          "owner",
+          "deadline",
+          "summary",
+          "status"
+        ],
+        "rubric_count": 6,
+        "rubric_valid": [
+          "action item",
+          "decision",
+          "owner",
+          "deadline",
+          "summary",
+          "status"
+        ],
+        "score": 50.0
+      },
+      "score": 50.0,
+      "task_id": "disagree-001"
+    },
+    {
+      "judge": "B_rule_keyword_coverage",
+      "model": "deterministic",
+      "raw": {
+        "delta": 50.0,
+        "disagree": true,
+        "disagree_threshold": 25.0,
+        "judge": "B_rule_keyword_coverage",
+        "matched_count": 6,
+        "matched_keywords": [
+          "action item",
+          "decision",
+          "owner",
+          "deadline",
+          "summary",
+          "status"
+        ],
+        "other_judge": "A_rubric_quality_0_5",
+        "other_score": 50.0,
+        "output_present": true,
+        "prompt": "action item, decision, owner, deadline, summary, status — these are listed but with no reasoning shown.",
+        "quality_markers": 0,
+        "rubric": [
+          "action item",
+          "decision",
+          "owner",
+          "deadline",
+          "summary",
+          "status"
+        ],
+        "rubric_count": 6,
+        "rubric_valid": [
+          "action item",
+          "decision",
+          "owner",
+          "deadline",
+          "summary",
+          "status"
+        ],
+        "score": 100.0
+      },
+      "score": 100.0,
+      "task_id": "disagree-001"
+    },
+    {
+      "judge": "A_rubric_quality_0_5",
+      "model": "deterministic",
+      "raw": {
+        "delta": 50.0,
+        "disagree": true,
+        "disagree_threshold": 25.0,
+        "judge": "A_rubric_quality_0_5",
+        "matched_count": 6,
+        "matched_keywords": [
+          "action item",
+          "decision",
+          "owner",
+          "line",
+          "cite",
+          "json"
+        ],
+        "other_judge": "B_rule_keyword_coverage",
+        "other_score": 100.0,
+        "output_present": true,
+        "prompt": "Extract action items, decisions, and owners from the meeting transcript into the provided JSON schema. Cite the line each item comes from; do not invent owners or due dates.",
+        "quality_markers": 0,
+        "rubric": [
+          "action item",
+          "decision",
+          "owner",
+          "line",
+          "cite",
+          "json"
+        ],
+        "rubric_count": 6,
+        "rubric_valid": [
+          "action item",
+          "decision",
+          "owner",
+          "line",
+          "cite",
+          "json"
+        ],
+        "score": 50.0
+      },
+      "score": 50.0,
+      "task_id": "extract-001"
+    },
+    {
+      "judge": "B_rule_keyword_coverage",
+      "model": "deterministic",
+      "raw": {
+        "delta": 50.0,
+        "disagree": true,
+        "disagree_threshold": 25.0,
+        "judge": "B_rule_keyword_coverage",
+        "matched_count": 6,
+        "matched_keywords": [
+          "action item",
+          "decision",
+          "owner",
+          "line",
+          "cite",
+          "json"
+        ],
+        "other_judge": "A_rubric_quality_0_5",
+        "other_score": 50.0,
+        "output_present": true,
+        "prompt": "Extract action items, decisions, and owners from the meeting transcript into the provided JSON schema. Cite the line each item comes from; do not invent owners or due dates.",
+        "quality_markers": 0,
+        "rubric": [
+          "action item",
+          "decision",
+          "owner",
+          "line",
+          "cite",
+          "json"
+        ],
+        "rubric_count": 6,
+        "rubric_valid": [
+          "action item",
+          "decision",
+          "owner",
+          "line",
+          "cite",
+          "json"
+        ],
+        "score": 100.0
+      },
+      "score": 100.0,
+      "task_id": "extract-001"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "sentinel_guard": true
+}

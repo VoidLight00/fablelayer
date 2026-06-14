@@ -1,0 +1,9 @@
+{
+  "run_id": "string",
+  "created_at": "ISO-8601",
+  "task_axis": "coding|agentic|planning",
+  "candidate_a": {"model_label_blinded":"A","input_tokens":0,"output_tokens":0,"cost_estimate":0,"answer_ref":"path"},
+  "candidate_b": {"model_label_blinded":"B","input_tokens":0,"output_tokens":0,"cost_estimate":0,"answer_ref":"path"},
+  "rubric": [{"criterion":"grounding","score_a":0,"score_b":0,"notes":"string"}],
+  "winner": "A|B|tie"
+}

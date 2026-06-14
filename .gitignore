@@ -1,0 +1,7 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+_dist/
+_workspace/benchmark_runs/
+_workspace/snapshots/
+.DS_Store

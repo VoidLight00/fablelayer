@@ -1,0 +1,53 @@
+{
+  "name": "fablelayer",
+  "version": "0.1.0",
+  "description": "FableLayer injects transferable procedure and output-structure layers (verification grounding, completion evidence gate, systematic investigation, early-stop prevention, value output style) into Opus, Sonnet, and local LLMs. It is a discipline layer, not a capability transplant: model capability does not transfer through a harness, only procedure does. Ships a reproducible benchmark that measures the discipline and its limits. See bench/RESULTS.md for measured results; capability vs procedure boundary is documented in README.md.",
+  "author": {
+    "name": "VoidLight",
+    "url": "https://github.com/VoidLight00"
+  },
+  "homepage": "https://github.com/VoidLight00/fablelayer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VoidLight00/fablelayer.git"
+  },
+  "license": "AGPL-3.0",
+  "keywords": [
+    "claude-code",
+    "harness",
+    "fable",
+    "procedure",
+    "verification-grounding",
+    "evidence-gate",
+    "early-stop-prevention",
+    "value-optimizer",
+    "model-router",
+    "local-llm",
+    "agents",
+    "skills"
+  ],
+  "claude_code": {
+    "min_version": "1.0.0",
+    "skills_dir": "./.claude/skills",
+    "agents_dir": "./agents",
+    "hooks": "./hooks/hooks.json"
+  },
+  "skills": [
+    "./.claude/skills/fablelayer-pipeline",
+    "./.claude/skills/fablelayer-promptcore",
+    "./.claude/skills/fablelayer-procedure-harness",
+    "./.claude/skills/fablelayer-value-optimizer",
+    "./.claude/skills/fablelayer-benchmark"
+  ],
+  "agents": [
+    "./agents"
+  ],
+  "hooks": "./hooks/hooks.json",
+  "layers": {
+    "promptcore": "./core",
+    "procedure_harness": "./agents",
+    "value_optimizer": "./styles",
+    "skillpack_router": "./skills"
+  },
+  "layers_note": "Layer directories are populated by the FableLayer build (modes: new, layer 1-4). promptcore=core/, procedure_harness=agents/ + hooks/, value_optimizer=styles/, skillpack_router=skills/. The plugin packages whichever layers exist at install time and does not synthesize missing layer content."
+}

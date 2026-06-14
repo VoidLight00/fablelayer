@@ -1,0 +1,39 @@
+{
+  "run_id": "20260614-mvp-001",
+  "mode": "new",
+  "input": "FableLayer v1.0 PRD",
+  "phases": {
+    "0-context": "done",
+    "1-spec": "done",
+    "2-build": "done",
+    "3-gates": "done",
+    "4-bench": "done",
+    "5-report": "done"
+  },
+  "gates": {
+  "selftest": "15/15 PASS",
+  "verify_fablelayer_mode_new": "exit 0",
+  "license_gate": "PASS",
+  "perf_claim_gate": "PASS",
+  "bench_integrity_gate": "PASS",
+  "completeness_gate": "PASS",
+  "render_gate": "PASS",
+  "runtime_gate": "PASS",
+  "final_selftest_exit": 0,
+  "final_verify_new_exit": 0,
+  "final_python_tests_exit": 0,
+  "final_promptcore_check_exit": 0,
+  "final_cli_help_exit": 0,
+  "publish_without_approval_exit": 2,
+  "verify_modes": "new/all/publish(approved)=0, publish(unapproved)=1"
+},
+  "soundness": {
+    "v1": 91,
+    "v2": 96,
+    "v3": 99,
+    "level": "L6",
+    "verdict": "sound"
+  },
+  "notes": "분리 디렉토리 fablelayer-opus (GPT-5.5 비교 대상은 fablelayer)",
+  "tests": "152 OK"
+}

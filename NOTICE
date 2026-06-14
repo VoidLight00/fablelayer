@@ -1,0 +1,15 @@
+FableLayer
+Copyright (c) 2026 VOIDLIGHT (Son)
+
+This product is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
+See the LICENSE file for the full license text.
+
+This product includes methodologies and procedures inspired by, but not copied from,
+the open-source projects listed in ATTRIBUTION.md. No leaked system-prompt full text
+is included; only publicly observed patterns are summarized under an "inspired-by"
+policy. See ATTRIBUTION.md for source-by-source license status and integration mode.
+
+FableLayer does not transplant model capability. It applies only the procedures whose
+transferability was empirically observed (verification grounding, completion/evidence
+gating, systematic investigation, early-stop prevention, structured output). Performance
+claims are backed exclusively by the reproducible benchmark in bench/ with stated limits.

@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0.0",
+  "description": "FableLayer benchmark raw data. Each entry in runs[] is one model invocation under one condition for one task. Scores are filled by judges. Prompts here are FableLayer's own authored task prompts, never leaked-prompt full text.",
+  "field_spec": {
+    "run_id": "string — unique id for this single invocation",
+    "task_id": "string — task identifier (joins to a task in tasks[])",
+    "task_type": "enum — debugging | multi-step-build | extraction",
+    "model": "string — model snapshot id measured (e.g. a specific Sonnet/Opus snapshot)",
+    "condition": "enum — baseline (procedure layer off) | treatment (procedure layer on)",
+    "ablation": "string|null — which procedure element is disabled, e.g. no-verification | no-evidence-gate | no-systematic-investigation | no-early-stop | full (none disabled)",
+    "seed": "integer — fixed seed for repeat control",
+    "repeats": "integer — number of fixed-seed repetitions aggregated into this entry",
+    "label_hidden": "boolean — true means condition/model masked from judges during scoring",
+    "prompt": "string — the task prompt presented to the model (FableLayer-authored, not leaked text)",
+    "output": "string|null — raw model output (null until measured)",
+    "judges": {
+      "A_rubric": "object — {scale: '0-5', score: number|null, items: object|null} rubric quantitative score",
+      "B_rule": "object — {pass_rate: number|null, checks: object|null} deterministic rule-based check"
+    },
+    "noise": "object — {n: integer|null, stddev: number|null} sample size and spread across repeats",
+    "model_version_note": "string — exact model version / date, recorded at measurement time",
+    "measured": "boolean — false means placeholder (not yet measured)",
+    "status_note": "string — e.g. 'placeholder — environment unavailable'"
+  },
+  "tasks": [
+    {
+      "task_id": "dbg-001",
+      "task_type": "debugging",
+      "summary": "Find root cause of an off-by-one in a pagination helper given a failing test."
+    },
+    {
+      "task_id": "build-001",
+      "task_type": "multi-step-build",
+      "summary": "Implement a small CLI subcommand across parse, validate, execute, and report steps."
+    },
+    {
+      "task_id": "extract-001",
+      "task_type": "extraction",
+      "summary": "Extract action items, decisions, and owners from a meeting transcript into a fixed JSON schema."
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "ph-0001",
+      "task_id": "dbg-001",
+      "task_type": "debugging",
+      "model": "TBD-at-measurement",
+      "condition": "baseline",
+      "ablation": "full",
+      "seed": 1,
+      "repeats": 0,
+      "label_hidden": true,
+      "prompt": "A pagination helper returns one fewer item on the last page. A failing test is provided. Identify the root cause and the fix.",
+      "output": null,
+      "judges": {
+        "A_rubric": { "scale": "0-5", "score": null, "items": null },
+        "B_rule": { "pass_rate": null, "checks": null }
+      },
+      "noise": { "n": null, "stddev": null },
+      "model_version_note": "",
+      "measured": false,
+      "status_note": "placeholder — environment unavailable, no live model call performed"
+    },
+    {
+      "run_id": "ph-0002",
+      "task_id": "dbg-001",
+      "task_type": "debugging",
+      "model": "TBD-at-measurement",
+      "condition": "treatment",
+      "ablation": "full",
+      "seed": 1,
+      "repeats": 0,
+      "label_hidden": true,
+      "prompt": "A pagination helper returns one fewer item on the last page. A failing test is provided. Identify the root cause and the fix.",
+      "output": null,
+      "judges": {
+        "A_rubric": { "scale": "0-5", "score": null, "items": null },
+        "B_rule": { "pass_rate": null, "checks": null }
+      },
+      "noise": { "n": null, "stddev": null },
+      "model_version_note": "",
+      "measured": false,
+      "status_note": "placeholder — environment unavailable, no live model call performed"
+    },
+    {
+      "run_id": "ph-0003",
+      "task_id": "build-001",
+      "task_type": "multi-step-build",
+      "model": "TBD-at-measurement",
+      "condition": "treatment",
+      "ablation": "no-early-stop",
+      "seed": 7,
+      "repeats": 0,
+      "label_hidden": true,
+      "prompt": "Implement a CLI subcommand with parse, validate, execute, and report steps. Complete all four steps.",
+      "output": null,
+      "judges": {
+        "A_rubric": { "scale": "0-5", "score": null, "items": null },
+        "B_rule": { "pass_rate": null, "checks": null }
+      },
+      "noise": { "n": null, "stddev": null },
+      "model_version_note": "",
+      "measured": false,
+      "status_note": "placeholder — ablation entry isolating early-stop prevention; not yet measured"
+    },
+    {
+      "run_id": "ph-0004",
+      "task_id": "extract-001",
+      "task_type": "extraction",
+      "model": "TBD-at-measurement",
+      "condition": "treatment",
+      "ablation": "no-evidence-gate",
+      "seed": 13,
+      "repeats": 0,
+      "label_hidden": true,
+      "prompt": "Extract action items, decisions, and owners from the transcript into the provided JSON schema. Cite the line each item comes from.",
+      "output": null,
+      "judges": {
+        "A_rubric": { "scale": "0-5", "score": null, "items": null },
+        "B_rule": { "pass_rate": null, "checks": null }
+      },
+      "noise": { "n": null, "stddev": null },
+      "model_version_note": "",
+      "measured": false,
+      "status_note": "placeholder — ablation entry isolating evidence gate; not yet measured"
+    }
+  ]
+}

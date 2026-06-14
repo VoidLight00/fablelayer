@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-06-14",
+  "items": [
+    {"name":"Anthropic Prompting Claude Fable 5 docs","url":"https://docs.anthropic.com/","license":null,"allowed_use":"reference-only","risk":"low","notes":"공식 문서 원칙 참조. 정확 URL과 라이선스는 구현 단계에서 재확인."},
+    {"name":"Simon Willison Fable analysis","url":"https://simonwillison.net/","license":null,"allowed_use":"reference-only","risk":"low","notes":"분석 글 원칙 참조. 원문 복사 금지."},
+    {"name":"elder-plinius/CL4R1T4S","url":"https://github.com/elder-plinius/CL4R1T4S","license":null,"allowed_use":"reference-only","risk":"high","notes":"유출 시스템 프롬프트 가능성. 원문 저장·재배포 금지."},
+    {"name":"asgeirtj/system_prompts_leaks","url":"https://github.com/asgeirtj/system_prompts_leaks","license":null,"allowed_use":"reference-only","risk":"high","notes":"유출 prompt 모음 가능성. 원문 저장·재배포 금지."},
+    {"name":"fivetaku/fablize","url":"https://github.com/fivetaku/fablize","license":null,"allowed_use":"unverified","risk":"medium","notes":"ProcedureHarness 참고 후보. LICENSE 확인 전 복사 금지."},
+    {"name":"itsinseong/value-for-fable","url":"https://github.com/itsinseong/value-for-fable","license":null,"allowed_use":"unverified","risk":"medium","notes":"ValueOptimizer 참고 후보. LICENSE 확인 전 복사 금지."},
+    {"name":"sgup/ai","url":"https://github.com/sgup/ai","license":null,"allowed_use":"unverified","risk":"medium","notes":"Fable style 참고 후보. LICENSE 확인 전 복사 금지."},
+    {"name":"robzilla1738/supergoal","url":"https://github.com/robzilla1738/supergoal","license":null,"allowed_use":"unverified","risk":"medium","notes":"SkillPack 참고 후보. LICENSE 확인 전 복사 금지."},
+    {"name":"ucsandman/context-handoff-bundle","url":"https://github.com/ucsandman/context-handoff-bundle","license":null,"allowed_use":"unverified","risk":"medium","notes":"handoff 패턴 참고 후보. LICENSE 확인 전 복사 금지."},
+    {"name":"CheswickDEV/claude-fable-5-prompt-optimizer","url":"https://github.com/CheswickDEV/claude-fable-5-prompt-optimizer","license":null,"allowed_use":"unverified","risk":"medium","notes":"optimizer 참고 후보. LICENSE 확인 전 복사 금지."}
+  ]
+}

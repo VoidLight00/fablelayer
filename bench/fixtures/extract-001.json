@@ -1,0 +1,14 @@
+{
+  "id": "extract-001",
+  "prompt": "Extract action items, decisions, and owners from the meeting transcript into the provided JSON schema. Cite the line each item comes from; do not invent owners or due dates.",
+  "rubric": [
+    "action item",
+    "decision",
+    "owner",
+    "line",
+    "cite",
+    "json"
+  ],
+  "task_type": "extraction",
+  "note": "FableLayer-authored task. Rubric keywords are checked by deterministic_judge (judge B). No leaked-prompt text."
+}

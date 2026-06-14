@@ -1,0 +1,2 @@
+# SomeOtherProject SSoT
+stuff

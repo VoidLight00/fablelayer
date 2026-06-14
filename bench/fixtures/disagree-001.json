@@ -1,0 +1,14 @@
+{
+  "id": "disagree-001",
+  "prompt": "action item, decision, owner, deadline, summary, status — these are listed but with no reasoning shown.",
+  "rubric": [
+    "action item",
+    "decision",
+    "owner",
+    "deadline",
+    "summary",
+    "status"
+  ],
+  "task_type": "extraction",
+  "note": "FableLayer-authored disagreement demo. The output names every rubric keyword (judge B high) but carries no evidence/verification markers (judge A low), so judge A and judge B split. Disagreement is kept in raw, never averaged. No leaked-prompt text."
+}

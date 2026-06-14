@@ -1,0 +1,49 @@
+# FableLayer CI — push/PR 시 테스트 + 게이트 자동 검증 (L7 자동화)
+#
+# 이 워크플로우는 검증만 수행한다. 외부 push/배포/공개 등록은 절대 하지 않는다.
+#   - GitHub repo push, Vercel deploy, /plugin marketplace 공개 등록 등 외부 작업은
+#     FL15 승인 게이트 뒤에서 사용자 명시 승인 후에만 진행한다.
+#   - 이 파일 자체도 생성만 했을 뿐 실제 push/실행은 사용자 승인 전까지 하지 않는다.
+#
+# stdlib only(외부 의존 0)이므로 pip install 단계가 없다.
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# 권한 최소화: 코드 읽기만. 외부 쓰기 작업 금지.
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: tests + gates (fail-closed)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Python version
+        run: python3 --version
+
+      # (1) 단위/통합 테스트 단일 진입점 — 하나라도 실패 시 exit 1
+      - name: Run tests
+        run: python3 tests/run_tests.py
+
+      # (2) 게이트 셀프테스트 — fixtures 기반 exit code 검증
+      - name: Gate selftest
+        run: bash gates/selftest.sh
+
+      # (3) 마스터 게이트 — OR집계, fail-closed. 하나라도 실패 시 비0
+      #     CI 러너에는 ~/fable-forge 의존이 없으므로 FL8 lint는 WARN으로 스킵된다(차단 아님).
+      - name: Master verify (mode=new)
+        run: bash gates/verify_fablelayer.sh . --mode new

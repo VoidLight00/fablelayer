@@ -1,0 +1,14 @@
+{
+  "id": "dbg-001",
+  "prompt": "A pagination helper returns one fewer item on the last page. A failing test is provided. Reproduce the failure, identify the root cause, propose the fix, and state how you verified it (test pass / exit code).",
+  "rubric": [
+    "root cause",
+    "off-by-one",
+    "reproduce",
+    "fix",
+    "test",
+    "verify"
+  ],
+  "task_type": "debugging",
+  "note": "FableLayer-authored task. Rubric keywords are checked by deterministic_judge (judge B). No leaked-prompt text."
+}
