@@ -59,6 +59,7 @@ bash gates/verify_fablelayer.sh . --mode new
 python3 tests/run_tests.py
 bash gates/selftest.sh
 bash gates/verify_fablelayer.sh . --mode new
+python3 proof/verify_claims.py .
 ```
 
 현재 로컬 실측 기준:
@@ -66,6 +67,18 @@ bash gates/verify_fablelayer.sh . --mode new
 - stdlib 테스트 152개 통과
 - `LICENSE/PERF/BENCH/COMPLETE/RENDER/RUNTIME` 게이트 통과
 - 승인 없는 publish는 의도적으로 비정상 종료
+- public claim check가 버전 정합, plugin 참조, 추적 파일 위생을 검증
+
+## 증명과 재현성
+
+FableLayer는 검증된 절차 주장과 검증되지 않은 capability-transfer 주장을 분리합니다.
+
+- [`proof/CLAIMS.md`](./proof/CLAIMS.md): 프로젝트가 주장하는 것과 주장하지 않는 것
+- [`proof/REPRODUCIBILITY.md`](./proof/REPRODUCIBILITY.md): clean checkout 재현 절차
+- [`proof/EXPERIMENT_DESIGN.md`](./proof/EXPERIMENT_DESIGN.md): 모델 단독 vs FableLayer 적용 비교 실험 설계
+- [`proof/THREATS_TO_VALIDITY.md`](./proof/THREATS_TO_VALIDITY.md): 한계와 실패 가능성
+
+CI matrix는 Python 3.10–3.13에서 테스트, proof claim, 게이트를 실행합니다.
 
 ## 공개-safe 소스 정책
 

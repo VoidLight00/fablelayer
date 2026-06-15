@@ -8,6 +8,8 @@ Public-release preparation pass.
 - Added installation, development, security, contribution, and version files.
 - Rewrote attribution and source ledger to avoid direct dependency on high-risk prompt-source repositories.
 - Tightened public-safe source policy language while preserving fail-closed gates.
+- Added proof and reproducibility docs plus `proof/verify_claims.py`.
+- Expanded CI to verify tests, public claims, and gates on Python 3.10–3.13.
 - Re-ran tests, selftest, and master verify.
 
 ## 0.1.0 — 2026-06-14

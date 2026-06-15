@@ -20,17 +20,21 @@ permissions:
 
 jobs:
   verify:
-    name: tests + gates (fail-closed)
+    name: tests + gates (py${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: ${{ matrix.python-version }}
 
       - name: Python version
         run: python3 --version
@@ -38,6 +42,10 @@ jobs:
       # (1) 단위/통합 테스트 단일 진입점 — 하나라도 실패 시 exit 1
       - name: Run tests
         run: python3 tests/run_tests.py
+
+      # (1.5) 공개 주장 검증 — version/plugin refs/public hygiene claims.
+      - name: Verify public claims
+        run: python3 proof/verify_claims.py .
 
       # (2) 게이트 셀프테스트 — fixtures 기반 exit code 검증
       - name: Gate selftest

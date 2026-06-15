@@ -71,6 +71,7 @@ See [`docs/INSTALL.md`](./docs/INSTALL.md) for detailed installation options.
 python3 tests/run_tests.py
 bash gates/selftest.sh
 bash gates/verify_fablelayer.sh . --mode new
+python3 proof/verify_claims.py .
 ```
 
 Current local evidence:
@@ -78,6 +79,18 @@ Current local evidence:
 - 152 stdlib tests pass
 - `LICENSE/PERF/BENCH/COMPLETE/RENDER/RUNTIME` gates pass
 - publish without approval exits non-zero by design
+- public claim checks verify version alignment, plugin references, and tracked-file hygiene
+
+## Proof and reproducibility
+
+FableLayer separates verified procedural claims from unsupported capability-transfer claims.
+
+- [`proof/CLAIMS.md`](./proof/CLAIMS.md) defines what the project claims and does not claim.
+- [`proof/REPRODUCIBILITY.md`](./proof/REPRODUCIBILITY.md) gives clean-checkout reproduction steps.
+- [`proof/EXPERIMENT_DESIGN.md`](./proof/EXPERIMENT_DESIGN.md) describes model-only vs model-plus-FableLayer comparisons.
+- [`proof/THREATS_TO_VALIDITY.md`](./proof/THREATS_TO_VALIDITY.md) records limits and failure modes.
+
+The CI matrix runs tests, proof claims, and gates on Python 3.10–3.13.
 
 ## Public-safe source policy
 
