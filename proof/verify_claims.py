@@ -163,8 +163,16 @@ def check_not_tracked(root: Path, tracked: list[str]) -> None:
 
 
 def check_no_local_artifacts(root: Path, tracked: list[str]) -> None:
+    # This checker defines the artifact patterns as string literals, so a naive
+    # scan would match its own source. Exclude the checker file from the scan.
+    try:
+        self_rel = str(Path(__file__).resolve().relative_to(root))
+    except ValueError:
+        self_rel = None
     offenders: list[str] = []
     for rel in tracked:
+        if self_rel is not None and rel == self_rel:
+            continue
         path = root / rel
         if path.suffix not in TEXT_SUFFIXES:
             continue
