@@ -4,6 +4,14 @@
 
 # FableLayer
 
+<p align="center">
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License: AGPL-3.0"></a>
+  <img src="https://img.shields.io/badge/version-0.1.1-green.svg" alt="Version 0.1.1">
+  <img src="https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2.svg" alt="Claude Code plugin">
+  <img src="https://img.shields.io/badge/gates-fail--closed-d62728.svg" alt="Fail-closed gates">
+  <img src="https://img.shields.io/badge/runtime%20deps-0-lightgrey.svg" alt="Zero runtime dependencies">
+</p>
+
 **FableLayer는 LLM 워크플로우를 위한 공개-safe 절차·검증·벤치마크 레이어입니다.**
 
 모델의 기본 capability 자체를 옮긴다고 주장하지 않습니다. 대신 강한 에이전트 작업에서 반복 가능한 부분, 즉 근거 규율, 체계적 조사, fail-closed 게이트, 모델 라우팅, 정직한 benchmark 기록을 패키징합니다.

@@ -4,6 +4,14 @@
 
 # FableLayer
 
+<p align="center">
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License: AGPL-3.0"></a>
+  <img src="https://img.shields.io/badge/version-0.1.1-green.svg" alt="Version 0.1.1">
+  <img src="https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2.svg" alt="Claude Code plugin">
+  <img src="https://img.shields.io/badge/gates-fail--closed-d62728.svg" alt="Fail-closed gates">
+  <img src="https://img.shields.io/badge/runtime%20deps-0-lightgrey.svg" alt="Zero runtime dependencies">
+</p>
+
 **FableLayer is a public-safe procedure, verification, and benchmark layer for LLM workflows.**
 
 It does not claim to transfer a model's underlying capability. It packages the repeatable parts of strong agentic work: evidence discipline, systematic investigation, fail-closed gates, model routing, and honest benchmark records.

@@ -34,6 +34,6 @@
     "level": "L6",
     "verdict": "sound"
   },
-  "notes": "분리 디렉토리 fablelayer-opus (GPT-5.5 비교 대상은 fablelayer)",
+  "notes": "에이전트별 전용 격리 루트로 비교 실험을 분리(FLOG-001)",
   "tests": "152 OK"
 }
