@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Marketplace metadata for FableLayer — a Claude Code plugin that injects transferable Fable-proven procedure and output-structure layers into Opus, Sonnet, and local LLMs, with a reproducible benchmark for its limits.",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     {
       "name": "fablelayer",
       "source": "./",
       "description": "Discipline layer (not a capability transplant): verification grounding, completion evidence gate, systematic investigation, early-stop prevention, and value output style packaged for Claude Code, CLI, and local LLM adapters. Performance claims are deferred to bench/RESULTS.md.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "AGPL-3.0",
       "author": {
         "name": "VoidLight",

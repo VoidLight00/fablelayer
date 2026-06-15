@@ -2,7 +2,6 @@ __pycache__/
 .pytest_cache/
 *.pyc
 _dist/
-_workspace/benchmark_runs/
-_workspace/snapshots/
+_workspace/
 .DS_Store
 CLAUDE.md

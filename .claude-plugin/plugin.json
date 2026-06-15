@@ -1,6 +1,6 @@
 {
   "name": "fablelayer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "FableLayer injects transferable procedure and output-structure layers (verification grounding, completion evidence gate, systematic investigation, early-stop prevention, value output style) into Opus, Sonnet, and local LLMs. It is a discipline layer, not a capability transplant: model capability does not transfer through a harness, only procedure does. Ships a reproducible benchmark that measures the discipline and its limits. See bench/RESULTS.md for measured results; capability vs procedure boundary is documented in README.md.",
   "author": {
     "name": "VoidLight",
