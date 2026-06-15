@@ -29,20 +29,17 @@
   "claude_code": {
     "min_version": "1.0.0",
     "skills_dir": "./.claude/skills",
-    "agents_dir": "./agents",
-    "hooks": "./hooks/hooks.json"
+    "agents_dir": "./agents"
   },
   "skills": [
     "./.claude/skills/fablelayer-pipeline",
-    "./.claude/skills/fablelayer-promptcore",
-    "./.claude/skills/fablelayer-procedure-harness",
-    "./.claude/skills/fablelayer-value-optimizer",
-    "./.claude/skills/fablelayer-benchmark"
+    "./.claude/skills/fablelayer-benchmark",
+    "./.claude/skills/fablelayer-qa-gates",
+    "./.claude/skills/fablelayer-source-ledger"
   ],
   "agents": [
     "./agents"
   ],
-  "hooks": "./hooks/hooks.json",
   "layers": {
     "promptcore": "./core",
     "procedure_harness": "./agents",

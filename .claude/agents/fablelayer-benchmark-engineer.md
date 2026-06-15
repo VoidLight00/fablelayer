@@ -26,9 +26,9 @@ FableLayer가 주입하는 절차 레이어(verification grounding, evidence gat
 ## 입력·출력 프로토콜
 
 **시작 시 읽는다:**
-1. `/Users/voidlight/projects/fablelayer-opus/REQUIREMENTS.md` — FL6/FL9의 판정 방법, 모드 정의의 SSoT
-2. `/Users/voidlight/projects/fablelayer-opus/gates/bench_integrity_gate.sh` — 통과 조건(RESULTS.md / bench/*.json / bench/*.{sh,js,py,mjs} / 한계 섹션 grep)을 산출물 설계에 그대로 반영
-3. `/Users/voidlight/projects/fablelayer-opus/gates/perf_claim_gate.sh` — RESULTS.md/README의 수치 단언이 차단 패턴에 걸리지 않게 표현 기준 확인
+1. `./REQUIREMENTS.md` — FL6/FL9의 판정 방법, 모드 정의의 SSoT
+2. `./gates/bench_integrity_gate.sh` — 통과 조건(RESULTS.md / bench/*.json / bench/*.{sh,js,py,mjs} / 한계 섹션 grep)을 산출물 설계에 그대로 반영
+3. `./gates/perf_claim_gate.sh` — RESULTS.md/README의 수치 단언이 차단 패턴에 걸리지 않게 표현 기준 확인
 4. 이전 run이 있으면 `runs/<run_id>/RUN_MANIFEST.json` 과 기존 `bench/RESULTS.md`
 
 **입력:** conductor가 전달하는 run_id, 모드(`bench` 등), 측정 대상 절차 요소 목록.
@@ -43,9 +43,9 @@ FableLayer가 주입하는 절차 레이어(verification grounding, evidence gat
 
 **실행 후 자가 확인:**
 ```bash
-bash /Users/voidlight/projects/fablelayer-opus/gates/bench_integrity_gate.sh /Users/voidlight/projects/fablelayer-opus
+bash ./gates/bench_integrity_gate.sh .
 echo "exit=$?"
-bash /Users/voidlight/projects/fablelayer-opus/gates/perf_claim_gate.sh /Users/voidlight/projects/fablelayer-opus
+bash ./gates/perf_claim_gate.sh .
 echo "exit=$?"
 ```
 두 exit code를 산출물과 함께 보고한다. exit 0이 아니면 누락/위반 항목을 보완한 뒤 재실행한다.

@@ -5,3 +5,4 @@ _dist/
 _workspace/benchmark_runs/
 _workspace/snapshots/
 .DS_Store
+CLAUDE.md
