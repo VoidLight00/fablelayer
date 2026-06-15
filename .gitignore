@@ -2,6 +2,9 @@ __pycache__/
 .pytest_cache/
 *.pyc
 _dist/
+dist/
+*.egg-info/
+.fablelayer/
 _workspace/
 .DS_Store
 CLAUDE.md

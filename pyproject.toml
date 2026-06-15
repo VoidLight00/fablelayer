@@ -18,7 +18,7 @@ dependencies = []
 fablelayer = "fablelayer.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/fablelayer/fablelayer"
+Homepage = "https://github.com/VoidLight00/fablelayer"
 
 [tool.setuptools]
 packages = ["fablelayer"]
