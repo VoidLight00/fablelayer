@@ -34,7 +34,7 @@ except Exception:  # pragma: no cover
     _adapters = None
 
 PROG = "fablelayer"
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 # FL11 canonical phase enum — 이 순서만 사용한다.
 CANONICAL_PHASES: tuple[str, ...] = (
@@ -52,6 +52,34 @@ PRODUCT_ROOT = Path(__file__).resolve().parent.parent
 
 # 전이 가능한 절차 레이어 디렉토리(capability 아님).
 LAYER_DIRS: tuple[str, ...] = ("core", "styles", "skills", "agents", "adapters")
+
+# Wheel/venv 설치처럼 소스 체크아웃의 bench/fixtures 디렉토리가 없는 환경에서도
+# `python -m fablelayer.cli benchmark` 가 바로 작동하도록 하는 최소 내장 fixture.
+# 소스 체크아웃에서는 여전히 bench/fixtures/*.json 을 우선 사용한다.
+FALLBACK_BENCH_TASKS: tuple[benchmark.BenchTask, ...] = (
+    benchmark.BenchTask(
+        id="dbg-001",
+        prompt=(
+            "A pagination helper returns one fewer item on the last page. "
+            "A failing test is provided. Reproduce the failure, identify the root cause, "
+            "propose the fix, and state how you verified it (test pass / exit code)."
+        ),
+        rubric=("root cause", "off-by-one", "reproduce", "fix", "test", "verify"),
+    ),
+    benchmark.BenchTask(
+        id="disagree-001",
+        prompt="action item, decision, owner, deadline, summary, status — these are listed but with no reasoning shown.",
+        rubric=("action item", "decision", "owner", "deadline", "summary", "status"),
+    ),
+    benchmark.BenchTask(
+        id="extract-001",
+        prompt=(
+            "Extract action items, decisions, and owners from the meeting transcript into the provided JSON schema. "
+            "Cite the line each item comes from; do not invent owners or due dates."
+        ),
+        rubric=("action item", "decision", "owner", "line", "cite", "json"),
+    ),
+)
 
 EXIT_OK = 0
 EXIT_USAGE = 2  # check 위반·인자 오류·미존재 자원 등 fail-closed
@@ -335,7 +363,7 @@ def _load_fixture_tasks() -> tuple[tuple[benchmark.BenchTask, ...], tuple[str, .
     tasks: list[benchmark.BenchTask] = []
     errors: list[str] = []
     if not fixtures_dir.is_dir():
-        return tuple(), (f"no fixtures dir: {fixtures_dir}",)
+        return FALLBACK_BENCH_TASKS, (f"source fixtures dir not found; using packaged fallback fixtures: {fixtures_dir}",)
 
     for path in sorted(fixtures_dir.glob("*.json")):
         try:
@@ -390,17 +418,29 @@ def cmd_benchmark(args: Args) -> int:
     outputs = _fixture_outputs(tasks)
     runs = benchmark.run_suite_dual(tasks, outputs)
 
-    raw_path = PRODUCT_ROOT / "bench" / "fixtures_raw.json"
+    source_bench_dir = PRODUCT_ROOT / "bench"
+    if (source_bench_dir / "fixtures").is_dir():
+        raw_path = source_bench_dir / "fixtures_raw.json"
+        results_path: Path | None = source_bench_dir / "RESULTS.md"
+    else:
+        # 설치된 wheel/site-packages 안에 쓰지 않는다. 사용자가 실행한 프로젝트 아래에
+        # 안전한 산출물 디렉토리를 만들면 `pip install fablelayer && fablelayer benchmark`
+        # 경험이 바로 작동한다.
+        raw_path = Path.cwd() / ".fablelayer" / "bench" / "fixtures_raw.json"
+        results_path = None
+
     try:
+        raw_path.parent.mkdir(parents=True, exist_ok=True)
         benchmark.write_raw(runs, str(raw_path))
     except OSError as exc:
         _err(f"ERROR: raw 기록 실패: {exc}")
         return EXIT_ERROR
 
     cases = benchmark.disagreement_cases(runs)
-    results_path = PRODUCT_ROOT / "bench" / "RESULTS.md"
-    updated = benchmark.update_results_disagreement(str(results_path), cases)
-    if not updated:
+    updated = False
+    if results_path is not None:
+        updated = benchmark.update_results_disagreement(str(results_path), cases)
+    if results_path is not None and not updated:
         # 절이 없으면 자동 삽입하지 않는다(fail-closed). 다른 절 오염 방지.
         _err(f"WARN: RESULTS.md 에 '## 심판 불일치' 절이 없어 자동 반영을 건너뜀: {results_path}")
 
@@ -438,9 +478,12 @@ def cmd_benchmark(args: Args) -> int:
     mean_b = round(total_b / n, 2) if n else 0.0
     _out("")
     _out(f"mean A       : {mean_a:.2f}   mean B : {mean_b:.2f}  (0..100; 두 심판 점수는 합치지 않음)")
+    if results_path is None:
+        disagreement_note = f"raw 기록만 수행 (설치 모드: {raw_path})"
+    else:
+        disagreement_note = "bench/RESULTS.md '## 심판 불일치' 자동 반영" if updated else "bench/RESULTS.md '## 심판 불일치' 절 미발견"
     _out(
-        f"disagreements: {disagree_n}/{n} task(s) → bench/RESULTS.md '## 심판 불일치' "
-        f"자동 반영{'' if updated else ' (절 미발견)'}"
+        f"disagreements: {disagree_n}/{n} task(s) → {disagreement_note}"
     )
     _out("note         : 두 심판은 서로 다른 논리이며 점수를 평균으로 덮지 않는다(불일치 보존).")
     _out("               capability 주장이 아니며, 성능 비교는 bench/RESULTS.md 의 '## 한계' 와 함께만 해석한다.")
@@ -824,11 +867,13 @@ _COMMANDS = {
 }
 
 
-def main(argv: list[str]) -> int:
+def main(argv: list[str] | None = None) -> int:
     """FableLayer CLI 진입점.
 
     no-arg / --help -> usage, exit 0. 알 수 없는 명령 -> exit 2.
     """
+    if argv is None:
+        argv = sys.argv[1:]
     args, early_exit = _parse(argv)
     if args is None:
         if early_exit == EXIT_OK and not (argv and argv[0] in ("-V", "--version")):

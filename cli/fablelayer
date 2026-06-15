@@ -24,7 +24,7 @@ CLI_DIR="$(cd "$(dirname "$SELF")" && pwd)"
 PRODUCT_ROOT="$(cd "$CLI_DIR/.." && pwd)"
 
 PROG="fablelayer"
-VERSION="0.1.0"
+VERSION="0.1.1"
 
 # FableLayer 가 설치/참조하는 전이 가능한 레이어 디렉토리 (capability 아님, 절차임)
 LAYER_DIRS="core styles skills agents adapters"

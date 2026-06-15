@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import io
 import json
+import os
+import sys
 import tempfile
 import unittest
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
@@ -293,6 +295,42 @@ class TestCmdStatusCrosscheck(unittest.TestCase):
             rc = cli.cmd_status(_args("status"))
         self.assertEqual(rc, cli.EXIT_OK)
         self.assertNotIn("CROSS-CHECK FAIL", err.getvalue())
+
+
+class TestInstalledCliUx(unittest.TestCase):
+    def test_main_accepts_console_script_call_without_explicit_argv(self):
+        old_argv = sys.argv[:]
+        out, err = io.StringIO(), io.StringIO()
+        try:
+            sys.argv = ["fablelayer", "--version"]
+            with redirect_stdout(out), redirect_stderr(err):
+                rc = cli.main()
+        finally:
+            sys.argv = old_argv
+        self.assertEqual(rc, cli.EXIT_OK)
+        self.assertIn("fablelayer 0.1.1", out.getvalue())
+        self.assertEqual(err.getvalue(), "")
+
+    def test_benchmark_works_without_source_checkout_fixtures(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cwd = Path(tmp) / "project"
+            fake_product_root = Path(tmp) / "site-packages"
+            cwd.mkdir()
+            fake_product_root.mkdir()
+
+            old_cwd = Path.cwd()
+            out, err = io.StringIO(), io.StringIO()
+            try:
+                os.chdir(cwd)
+                with _patched_root(fake_product_root), redirect_stdout(out), redirect_stderr(err):
+                    rc = cli.cmd_benchmark(_args("benchmark"))
+            finally:
+                os.chdir(old_cwd)
+
+            self.assertEqual(rc, cli.EXIT_OK)
+            self.assertTrue((cwd / ".fablelayer" / "bench" / "fixtures_raw.json").is_file())
+            self.assertIn("using packaged fallback fixtures", err.getvalue())
+            self.assertIn("tasks scored : 3", out.getvalue())
 
 
 if __name__ == "__main__":
